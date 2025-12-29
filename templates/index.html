@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Brøkkort</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header class="app-header">
+    <h1>Brøkkort</h1>
+    <p>Lav færdige brøkkort til undervisning – hurtigt og enkelt</p>
+</header>
+
+<main class="container">
+
+    <!-- START -->
+    <section class="card start-section">
+        <h2>Start her</h2>
+        <button class="primary-button" type="button" id="generate-random">
+            🎲 Vælg tilfældige brøker
+        </button>
+        <p class="hint">
+            Der genereres automatisk et standardsæt brøker mellem 0 og 1.
+        </p>
+    </section>
+
+    <!-- FORHÅNDSVISNING -->
+    <section class="card preview-section">
+        <h2>Forhåndsvisning</h2>
+
+        <div id="fraction-grid">
+            <!-- udfyldes af JavaScript -->
+        </div>
+    </section>
+
+    <!-- HANDLINGER -->
+    <section class="card actions-section">
+        <button class="secondary-button" type="button" id="regenerate">
+            🔄 Vælg nye tilfældige brøker
+        </button>
+
+        <!-- ⚠️ VIGTIGT: INGEN FORM -->
+        <button class="primary-button" type="button" id="generate-pdf">
+            📄 Generér PDF
+        </button>
+    </section>
+
+</main>
+
+<!-- MODAL -->
+<div id="edit-modal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Redigér brøk</h2>
+
+        <label>
+            Tæller
+            <input type="number" min="1">
+        </label>
+
+        <label>
+            Nævner
+            <input type="number" min="2">
+        </label>
+
+        <div class="modal-actions">
+            <button class="secondary-button" type="button">Annuller</button>
+            <button class="primary-button" type="button">Gem</button>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

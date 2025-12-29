@@ -1,0 +1,120 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.app-header {
+    background: #ffffff;
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+.container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    display: grid;
+    gap: 2rem;
+}
+
+.card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.start-section {
+    text-align: center;
+}
+
+.primary-button {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.primary-button:hover {
+    background: #1e4ed8;
+}
+
+.secondary-button {
+    background: #e5e7eb;
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#fraction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.fraction-card {
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.fraction-card:hover {
+    background: #eef2ff;
+}
+
+.numerator,
+.denominator {
+    display: block;
+}
+
+.divider {
+    height: 1px;
+    background: #333;
+    margin: 0.3rem 0;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 300px;
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+}
