@@ -7,15 +7,19 @@ def draw_rectangle_fraction(
     num: int,
     den: int,
     width: float = 5 * cm,
-    height: float = 1.5 * cm,
+    height: float | None = None,
     fill_color=colors.HexColor("#1f77b4"),
     stroke_color=colors.black
 ) -> Drawing:
     """
-    Tegner en rektangel-arealmodel for brøken num/den.
+    Tegner en adaptiv rektangel-arealmodel for brøken num/den.
+
     Rektanglet opdeles i 'den' lige store lodrette felter.
     'num' felter farves, alle felter har kontur.
     """
+
+    if height is None:
+        height = 1.5 * cm
 
     drawing = Drawing(width, height)
 
@@ -24,23 +28,15 @@ def draw_rectangle_fraction(
     for i in range(den):
         x = i * cell_width
 
-        # Farv tællerens dele
-        if i < num:
-            rect = Rect(
-                x, 0,
-                cell_width, height,
-                fillColor=fill_color,
-                strokeColor=stroke_color,
-                strokeWidth=1
-            )
-        else:
-            rect = Rect(
-                x, 0,
-                cell_width, height,
-                fillColor=None,
-                strokeColor=stroke_color,
-                strokeWidth=1
-            )
+        rect = Rect(
+            x,
+            0,
+            cell_width,
+            height,
+            fillColor=fill_color if i < num else None,
+            strokeColor=stroke_color,
+            strokeWidth=1
+        )
 
         drawing.add(rect)
 
