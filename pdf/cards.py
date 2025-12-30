@@ -22,7 +22,8 @@ from pdf.templates import (
 )
 
 # Midlertidig import (flyttes senere)
-from pdf.generator import draw_number_line
+from pdf.representations.numberline import draw_number_line
+
 
 
 # -------------------------------------------------
