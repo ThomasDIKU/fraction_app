@@ -1,5 +1,8 @@
 """
-Logik for ét brøkkort.
+Logik for ét brøkkort som en stak af repræsentationer.
+
+Et kort = én brøk + 1..n repræsentationer
+Alle repræsentationer behandles ens (symbol er også en repræsentation).
 """
 
 from reportlab.platypus import Table, TableStyle, Paragraph
@@ -18,49 +21,82 @@ from pdf.representations.rectangle import draw_rectangle_fraction
 
 
 # -------------------------------------------------
+# Repræsentations-dispatch
+# -------------------------------------------------
+def _build_representation(rep: str, num: int, den: int, styles):
+    if rep == "symbol":
+        return Paragraph(
+            f"<para align='center'><font size={FRACTION_FONT_SIZE}>{num}<br/>—<br/>{den}</font></para>",
+            styles["Normal"]
+        )
+
+    if rep == "rectangle":
+        return draw_rectangle_fraction(num, den)
+
+    # default = numberline
+    return draw_number_line(num, den)
+
+
+# -------------------------------------------------
 # Byg ét brøkkort
 # -------------------------------------------------
 def build_fraction_card(
     num: int,
     den: int,
     styles,
-    representation: str = "numberline"
+    representations: list[str] | None = None
 ) -> Table:
     """
     Bygger ét brøkkort for brøken num/den.
 
-    representation:
-        - "numberline" (default)
-        - "rectangle"
+    representations:
+        None  -> ["symbol", "numberline"]
+        ["symbol"]
+        ["numberline", "rectangle"]
+        ["symbol", "numberline", "rectangle"]
     """
 
-    fraction_text = Paragraph(
-        f"<para align='center'><font size={FRACTION_FONT_SIZE}>{num}<br/>—<br/>{den}</font></para>",
-        styles["Normal"]
-    )
+    if not representations:
+        representations = ["symbol", "numberline"]
 
-    # Vælg repræsentation
-    if representation == "rectangle":
-        visual = draw_rectangle_fraction(num, den)
-    else:
-        visual = draw_number_line(num, den)
+    visuals = [
+        _build_representation(rep, num, den, styles)
+        for rep in representations
+    ]
 
-    # Proportioner
-    fraction_height = CARD_HEIGHT * 0.6
-    visual_height = CARD_HEIGHT * 0.4
+    # -------------------------------------------------
+    # Dynamisk layout
+    # -------------------------------------------------
+    row_count = len(visuals)
+
+    # Symbol fylder lidt mindre end grafik
+    weights = []
+    for rep in representations:
+        if rep == "symbol":
+            weights.append(1)
+        else:
+            weights.append(2)
+
+    total_weight = sum(weights)
+    row_heights = [
+        CARD_HEIGHT * (w / total_weight)
+        for w in weights
+    ]
+
+    rows = [[v] for v in visuals]
 
     card = Table(
-        [[fraction_text], [visual]],
+        rows,
         colWidths=[CARD_WIDTH],
-        rowHeights=[fraction_height, visual_height]
+        rowHeights=row_heights
     )
 
     card.setStyle(TableStyle([
         ("BOX", (0, 0), (-1, -1), CARD_BORDER_WIDTH, CARD_BORDER_COLOR),
         ("ALIGN", (0, 0), (-1, -1), "CENTER"),
         ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("TOPPADDING", (0, 0), (-1, -1), 0.3 * cm),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 0.3 * cm),
+        ("TOPPADDING", (0, 0), (-1, -1), 0.25 * cm),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 0.25 * cm),
     ]))
 
     return card
