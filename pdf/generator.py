@@ -28,13 +28,14 @@ def build_pdf(
     Genererer en PDF med brøkkort.
 
     representations:
-        - None → default ["numberline"]
-        - ["numberline"]
-        - ["numberline", "rectangle"]
+        None -> ["symbol", "numberline"]
+        ["symbol"]
+        ["numberline", "rectangle"]
+        ["symbol", "numberline", "rectangle"]
     """
 
-    if representations is None:
-        representations = ["numberline"]
+    if not representations:
+        representations = ["symbol", "numberline"]
 
     doc = SimpleDocTemplate(
         output_path,
