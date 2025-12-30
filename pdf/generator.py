@@ -22,22 +22,19 @@ def build_pdf(
     output_path: str,
     fractions: List[Fraction],
     cards_per_row: int = 3,
-    representation: str = "numberline"
+    representations: list[str] | None = None
 ):
     """
     Genererer en PDF med brøkkort.
 
-    Parameters
-    ----------
-    output_path : str
-        Hvor PDF'en gemmes
-    fractions : List[(n, d)]
-        Liste af brøker
-    cards_per_row : int
-        Antal kort pr. række
-    representation : str
-        Visualiseringstype (default: "numberline")
+    representations:
+        - None → default ["numberline"]
+        - ["numberline"]
+        - ["numberline", "rectangle"]
     """
+
+    if representations is None:
+        representations = ["numberline"]
 
     doc = SimpleDocTemplate(
         output_path,
@@ -52,7 +49,12 @@ def build_pdf(
 
     # Byg kort
     cards = [
-        build_fraction_card(n, d, styles, representation=representation)
+        build_fraction_card(
+            n,
+            d,
+            styles,
+            representations=representations
+        )
         for n, d in fractions
     ]
 
