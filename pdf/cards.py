@@ -14,14 +14,24 @@ from pdf.templates import (
 )
 
 from pdf.representations.numberline import draw_number_line
+from pdf.representations.rectangle import draw_rectangle_fraction
 
 
 # -------------------------------------------------
 # Byg ét brøkkort
 # -------------------------------------------------
-def build_fraction_card(num: int, den: int, styles) -> Table:
+def build_fraction_card(
+    num: int,
+    den: int,
+    styles,
+    representation: str = "numberline"
+) -> Table:
     """
     Bygger ét brøkkort for brøken num/den.
+
+    representation:
+        - "numberline" (default)
+        - "rectangle"
     """
 
     fraction_text = Paragraph(
@@ -29,16 +39,20 @@ def build_fraction_card(num: int, den: int, styles) -> Table:
         styles["Normal"]
     )
 
-    number_line = draw_number_line(num, den)
+    # Vælg repræsentation
+    if representation == "rectangle":
+        visual = draw_rectangle_fraction(num, den)
+    else:
+        visual = draw_number_line(num, den)
 
-    # Bedre proportioner: mere luft til brøken
+    # Proportioner
     fraction_height = CARD_HEIGHT * 0.6
-    numberline_height = CARD_HEIGHT * 0.4
+    visual_height = CARD_HEIGHT * 0.4
 
     card = Table(
-        [[fraction_text], [number_line]],
+        [[fraction_text], [visual]],
         colWidths=[CARD_WIDTH],
-        rowHeights=[fraction_height, numberline_height]
+        rowHeights=[fraction_height, visual_height]
     )
 
     card.setStyle(TableStyle([
