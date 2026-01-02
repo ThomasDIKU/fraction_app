@@ -11,7 +11,7 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateRandomFractions(count = 9) {
+function generateRandomFractions(count = 12) {
     const result = [];
     const maxDenominator = 9;
 
