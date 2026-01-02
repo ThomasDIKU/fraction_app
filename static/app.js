@@ -13,7 +13,7 @@ function randomInt(min, max) {
 
 function generateRandomFractions(count = 12) {
     const result = [];
-    const maxDenominator = 9;
+    const maxDenominator = 12;
 
     while (result.length < count) {
         const d = randomInt(2, maxDenominator);
