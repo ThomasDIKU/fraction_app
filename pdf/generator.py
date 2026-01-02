@@ -35,7 +35,13 @@ def build_pdf(
     """
 
     if not representations:
-        representations = ["symbol", "numberline"]
+        representations = ["symbol", "numberline", "rectangle"]
+
+    # Sørg for at symbol altid står øverst (layout-robusthed)
+    if "symbol" in representations:
+        representations = ["symbol"] + [
+            r for r in representations if r != "symbol"
+    ]
 
     doc = SimpleDocTemplate(
         output_path,

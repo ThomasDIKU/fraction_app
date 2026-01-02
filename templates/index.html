@@ -16,14 +16,42 @@
 
     <!-- START -->
     <section class="card start-section">
-        <h2>Start her</h2>
-        <button class="primary-button" type="button" id="generate-random">
-            🎲 Vælg tilfældige brøker
-        </button>
+    <h2>Start her</h2>
+
+    <button class="primary-button" type="button" id="generate-random">
+        🎲 Vælg tilfældige brøker
+    </button>
+
+    <p class="hint">
+        Der genereres automatisk et standardsæt brøker mellem 0 og 1.
+    </p>
+
+    <!-- REPRÆSENTATIONSVALG -->
+    <div class="representation-options">
+        <h3>Vælg repræsentationer</h3>
+
+        <div class="checkbox-group">
+            <label class="checkbox-item">
+                <input type="checkbox" value="symbol" checked>
+                <span>Symbol (brøk)</span>
+            </label>
+
+            <label class="checkbox-item">
+                <input type="checkbox" value="numberline" checked>
+                <span>Tallinje</span>
+            </label>
+
+            <label class="checkbox-item">
+                <input type="checkbox" value="rectangle">
+                <span>Arealmodel (rektangel)</span>
+            </label>
+        </div>
+
         <p class="hint">
-            Der genereres automatisk et standardsæt brøker mellem 0 og 1.
+            Vælg én eller flere repræsentationer til hvert kort.
         </p>
-    </section>
+    </div>
+</section>
 
     <!-- FORHÅNDSVISNING -->
     <section class="card preview-section">

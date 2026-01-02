@@ -1,134 +1,147 @@
-console.log("app.js loaded");
-
-// ---------- State ----------
+// -------------------------------------------------
+// State
+// -------------------------------------------------
 let fractions = [];
-let selectedIndex = null;
 
-// ---------- Config ----------
-const FRACTION_COUNT = 12;
-const MAX_DENOMINATOR = 10;
 
-// ---------- DOM ----------
-const grid = document.getElementById("fraction-grid");
-const generateBtn = document.getElementById("generate-random");
-const regenerateBtn = document.getElementById("regenerate");
-const pdfBtn = document.getElementById("generate-pdf");
-
-const modal = document.getElementById("edit-modal");
-const saveBtn = modal.querySelector(".primary-button");
-const cancelBtn = modal.querySelector(".secondary-button");
-const numeratorInput = modal.querySelector("input[min='1']");
-const denominatorInput = modal.querySelector("input[min='2']");
-
-// ---------- Helpers ----------
+// -------------------------------------------------
+// Hjælpefunktioner
+// -------------------------------------------------
 function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-// ---------- Generate ----------
-function generateRandomFractions() {
-    console.log("Generating random fractions");
-    fractions = [];
+function generateRandomFractions(count = 9) {
+    const result = [];
+    const maxDenominator = 9;
 
-    for (let i = 0; i < FRACTION_COUNT; i++) {
-        const d = randomInt(2, MAX_DENOMINATOR);
+    while (result.length < count) {
+        const d = randomInt(2, maxDenominator);
         const n = randomInt(1, d - 1);
-        fractions.push({ n, d });
+
+        if (!result.some(f => f.n === n && f.d === d)) {
+            result.push({ n, d });
+        }
     }
 
-    render();
+    return result;
 }
 
-// ---------- Render ----------
-function render() {
-    console.log("Rendering fractions", fractions);
+function renderFractions() {
+    const grid = document.getElementById("fraction-grid");
     grid.innerHTML = "";
 
-    fractions.forEach((frac, index) => {
-        const card = document.createElement("div");
-        card.className = "fraction-card";
+    fractions.forEach((f, index) => {
+        const div = document.createElement("div");
+        div.className = "fraction-preview";
+        div.textContent = `${f.n}/${f.d}`;
 
-        card.innerHTML = `
-            <span class="numerator">${frac.n}</span>
-            <span class="divider"></span>
-            <span class="denominator">${frac.d}</span>
-        `;
+        div.addEventListener("click", () => editFraction(index));
 
-        card.addEventListener("click", () => openModal(index));
-        grid.appendChild(card);
+        grid.appendChild(div);
     });
 }
 
-// ---------- Modal ----------
-function openModal(index) {
-    selectedIndex = index;
-    numeratorInput.value = fractions[index].n;
-    denominatorInput.value = fractions[index].d;
+
+// -------------------------------------------------
+// Redigér brøk
+// -------------------------------------------------
+function editFraction(index) {
+    const modal = document.getElementById("edit-modal");
+    const inputs = modal.querySelectorAll("input");
+    const cancelBtn = modal.querySelector(".secondary-button");
+    const saveBtn = modal.querySelector(".primary-button");
+
+    inputs[0].value = fractions[index].n;
+    inputs[1].value = fractions[index].d;
+
     modal.classList.remove("hidden");
-}
 
-function closeModal() {
-    modal.classList.add("hidden");
-    selectedIndex = null;
-}
+    cancelBtn.onclick = () => {
+        modal.classList.add("hidden");
+    };
 
-saveBtn.addEventListener("click", () => {
-    const n = parseInt(numeratorInput.value);
-    const d = parseInt(denominatorInput.value);
+    saveBtn.onclick = () => {
+        const n = parseInt(inputs[0].value, 10);
+        const d = parseInt(inputs[1].value, 10);
 
-    if (!(n > 0 && d > 0 && n < d)) {
-        alert("Ugyldig brøk. Tæller skal være mindre end nævner.");
-        return;
-    }
-
-    fractions[selectedIndex] = { n, d };
-    closeModal();
-    render();
-});
-
-cancelBtn.addEventListener("click", closeModal);
-
-// ---------- PDF ----------
-pdfBtn.addEventListener("click", async () => {
-    console.log("Generate PDF clicked");
-
-    try {
-        const response = await fetch("/generate-pdf", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ fractions })
-        });
-
-        console.log("Response status:", response.status);
-
-        if (!response.ok) {
-            alert("Serverfejl ved generering af PDF");
+        if (!Number.isInteger(n) || !Number.isInteger(d) || n <= 0 || d <= n) {
+            alert("Ugyldig brøk");
             return;
         }
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
+        fractions[index] = { n, d };
+        modal.classList.add("hidden");
+        renderFractions();
+    };
+}
 
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "broekkort.pdf";
-        document.body.appendChild(a);
-        a.click();
 
-        a.remove();
-        window.URL.revokeObjectURL(url);
+// -------------------------------------------------
+// Læs repræsentationer (robust)
+// -------------------------------------------------
+function getSelectedRepresentations() {
+    const checkboxes = document.querySelectorAll(
+        'input[type="checkbox"]:checked'
+    );
 
-    } catch (err) {
-        console.error("Fetch error:", err);
-        alert("Kunne ikke kontakte serveren");
+    const values = Array.from(checkboxes).map(cb => cb.value);
+
+    // Hvis ingen er valgt, lad backend styre defaults
+    if (values.length === 0) {
+        return null;
     }
+
+    return values;
+}
+
+
+// -------------------------------------------------
+// Events
+// -------------------------------------------------
+document.getElementById("generate-random").addEventListener("click", () => {
+    fractions = generateRandomFractions();
+    renderFractions();
 });
 
-// ---------- Events ----------
-generateBtn.addEventListener("click", generateRandomFractions);
-regenerateBtn.addEventListener("click", generateRandomFractions);
+document.getElementById("regenerate").addEventListener("click", () => {
+    fractions = generateRandomFractions();
+    renderFractions();
+});
 
-// ---------- Init ----------
-generateRandomFractions();
+document.getElementById("generate-pdf").addEventListener("click", async () => {
+    if (fractions.length === 0) {
+        alert("Der er ingen brøker at generere PDF for.");
+        return;
+    }
+
+    const representations = getSelectedRepresentations();
+
+    const response = await fetch("/generate-pdf", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            fractions: fractions,
+            representations: representations
+        })
+    });
+
+    if (!response.ok) {
+        alert("Der opstod en fejl ved generering af PDF.");
+        return;
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "broekkort.pdf";
+    document.body.appendChild(a);
+    a.click();
+
+    a.remove();
+    window.URL.revokeObjectURL(url);
+});

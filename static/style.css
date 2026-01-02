@@ -118,3 +118,52 @@ body {
     display: flex;
     justify-content: space-between;
 }
+
+/* ------------------------------------
+   Repræsentationsvalg
+------------------------------------ */
+
+.representation-options {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.representation-options h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+
+    padding: 0.45rem 0.6rem;
+    border-radius: 8px;
+
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.checkbox-item:hover {
+    background-color: #eef2ff; /* matcher hover-farver i resten af UI */
+}
+
+.checkbox-item input {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.checkbox-item span {
+    user-select: none;
+    font-size: 0.95rem;
+}

@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, send_file, jsonify
 import tempfile
 
-from pdf_generator import build_pdf
+# NY importsti efter omstrukturering
+from pdf.generator import build_pdf
 
 app = Flask(__name__)
 
@@ -18,11 +19,16 @@ def index():
 # Generér PDF ud fra frontend-brøker
 # -------------------------------------------------
 @app.route("/generate-pdf", methods=["POST"])
-def generate_pdf():
+def generate_pdf_route():
     data = request.get_json()
 
     if not data or "fractions" not in data:
         return jsonify({"error": "Ingen brøker modtaget"}), 400
+
+    representations = data.get("representations")
+    if not representations:
+        representations = None
+
 
     parsed = []
 
@@ -38,11 +44,14 @@ def generate_pdf():
     except (KeyError, TypeError, ValueError):
         return jsonify({"error": "Forkert dataformat"}), 400
 
-    # Lav midlertidig PDF
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     tmp.close()
 
-    build_pdf(tmp.name, parsed)
+    build_pdf(
+        tmp.name,
+        parsed,
+        representations=representations
+    )
 
     return send_file(
         tmp.name,

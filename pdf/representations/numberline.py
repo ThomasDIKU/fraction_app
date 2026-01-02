@@ -3,23 +3,93 @@ from reportlab.lib import colors
 from reportlab.lib.units import cm
 
 
-def draw_number_line(num: int, den: int, width=5 * cm) -> Drawing:
-    drawing = Drawing(width, 1.5 * cm)
-    y = 0.8 * cm
+def draw_numberline(
+    numerator: int,
+    denominator: int,
+    *,
+    width: float = 5 * cm,
+    height: float = 1.6 * cm,
+    show_divisions: bool = True,
+    show_marker: bool = True
+) -> Drawing:
+    """
+    Tegner en tallinje fra 0 til 1 med valgfri inddeling og markering.
+    """
 
-    # Tallinje
-    drawing.add(Line(0, y, width, y, strokeWidth=2))
+    d = Drawing(width, height)
 
-    # Markér brøken
-    x = width * (num / den)
-    drawing.add(Circle(x, y, 3, fillColor=colors.black))
+    # Baseline
+    y = height / 2
+    margin = 0.4 * cm
+    x_start = margin
+    x_end = width - margin
 
-    # Endepunkter
-    drawing.add(Line(0, y - 4, 0, y + 4))
-    drawing.add(Line(width, y - 4, width, y + 4))
+    line_color = colors.darkgray
 
-    # Labels
-    drawing.add(String(-4, y - 12, "0", fontSize=10))
-    drawing.add(String(width - 6, y - 12, "1", fontSize=10))
+    # Hovedlinje
+    d.add(Line(
+        x_start, y,
+        x_end, y,
+        strokeWidth=1.5,
+        strokeColor=line_color
+    ))
 
-    return drawing
+    # Endemarkeringer
+    end_height = 6
+    d.add(Line(x_start, y - end_height, x_start, y + end_height, strokeColor=line_color))
+    d.add(Line(x_end, y - end_height, x_end, y + end_height, strokeColor=line_color))
+
+    # Inddelingsstreger (nævner)
+    if show_divisions and denominator > 1:
+        step = (x_end - x_start) / denominator
+        tick_height = 4
+
+        for i in range(1, denominator):
+            x = x_start + i * step
+            d.add(Line(
+                x, y - tick_height,
+                x, y + tick_height,
+                strokeWidth=1,
+                strokeColor=line_color
+            ))
+
+    # Markering (prik)
+    if show_marker:
+        pos = numerator / denominator
+        x_marker = x_start + pos * (x_end - x_start)
+
+        d.add(Circle(
+            x_marker,
+            y,
+            1.2,
+            fillColor=colors.black,
+            strokeColor=colors.black
+        ))
+
+    # Tal 0 og 1 (indenfor linjen)
+    label_offset = 16
+
+    d.add(String(
+        x_start,
+        y - label_offset,
+        "0",
+        fontSize=10,
+        textAnchor="middle"
+    ))
+
+    d.add(String(
+        x_end,
+        y - label_offset,
+        "1",
+        fontSize=10,
+        textAnchor="middle"
+    ))
+
+    return d
+
+
+# -------------------------------------------------
+# BAGUDKOMPATIBILITET
+# -------------------------------------------------
+# cards.py importerer stadig draw_number_line
+draw_number_line = draw_numberline
